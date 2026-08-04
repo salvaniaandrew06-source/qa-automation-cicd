@@ -1,47 +1,58 @@
-# pyright: reportMissingImports=false
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import time
+from selenium.webdriver.chrome.options import Options
 
-driver = webdriver.Chrome()
+URL = "https://practicetestautomation.com/practice-test-login/"
 
-driver.get("https://practicetestautomation.com/practice-test-login/")
 
-driver.find_element(By.ID, "username").send_keys("student")
-driver.find_element(By.ID, "password").send_keys("Password123")
+def login(username, password):
+    options = Options()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
-driver.find_element(By.ID, "submit").click()
+    driver = webdriver.Chrome(options=options)
 
-time.sleep(2)
+    driver.get(URL)
 
-# Test Case 1: Valid Login
-def test_valid_login(self):
-        self.login("student", "Password123")
-        self.assertIn("Logged In Successfully", self.driver.page_source)
+    driver.find_element(By.ID, "username").send_keys(username)
+    driver.find_element(By.ID, "password").send_keys(password)
+    driver.find_element(By.ID, "submit").click()
 
-# Test Case 2: Invalid Username
-def test_invalid_username(self):
-        self.login("wrongUser", "Password123")
-        self.assertIn("Your username is invalid!", self.driver.page_source)
+    return driver
 
-# Test Case 3: Invalid Password
-def test_invalid_password(self):
-        self.login("student", "wrongPass")
-        self.assertIn("Your password is invalid!", self.driver.page_source)
 
-# Test Case 4: Empty Username
-def test_empty_username(self):
-        self.login("", "Password123")
-        self.assertIn("Your username is invalid!", self.driver.page_source)
+def test_valid_login():
+    driver = login("student", "Password123")
+    assert "Logged In Successfully" in driver.page_source
+    driver.quit()
 
-# Test Case 5: Empty Password
-def test_empty_password(self):
-        self.login("student", "")
-        self.assertIn("Your password is invalid!", self.driver.page_source)
 
-# Test Case 6: Both Fields Empty
-def test_empty_fields(self):
-        self.login("", "")
-        self.assertIn("Your username is invalid!", self.driver.page_source)
+def test_invalid_username():
+    driver = login("wrongUser", "Password123")
+    assert "Your username is invalid!" in driver.page_source
+    driver.quit()
 
-driver.quit()
+
+def test_invalid_password():
+    driver = login("student", "wrongPass")
+    assert "Your password is invalid!" in driver.page_source
+    driver.quit()
+
+
+def test_empty_username():
+    driver = login("", "Password123")
+    assert "Your username is invalid!" in driver.page_source
+    driver.quit()
+
+
+def test_empty_password():
+    driver = login("student", "")
+    assert "Your password is invalid!" in driver.page_source
+    driver.quit()
+
+
+def test_empty_fields():
+    driver = login("", "")
+    assert "Your username is invalid!" in driver.page_source
+    driver.quit()
